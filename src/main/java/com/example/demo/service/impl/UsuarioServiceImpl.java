@@ -53,9 +53,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 				usuarioEncontradoPorcCorreo.getPassword())) {
 			return false;
 		}
-		
 		session.setAttribute("usuario", usuarioEncontradoPorcCorreo.getCorreo());
-		
 		
 		return true;
 	}
@@ -64,8 +62,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 
 	@Override
 	public UsuarioEntity buscarUsuarioPorCorreo(String correo) {
-		// TODO Auto-generated method stub
-		return null;
+		return usuarioRepository.findByCorreo(correo);
 	}
 
 }
