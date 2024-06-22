@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.example.demo.entity.UsuarioEntity;
 import com.example.demo.service.UsuarioService;
 
 @Controller
@@ -20,6 +21,11 @@ public class ProductoController {
 		if(session.getAttribute("usuario") == null) {
 			return "redirect:/";
 		}
+		
+		String correo = session.getAttribute("usuario").toString();
+		UsuarioEntity usuarioEntity = usuarioService.buscarUsuarioPorCorreo(correo);
+		model.addAttribute("foto", usuarioEntity.getUrlImagen());
+		
 		
 		return "menu";
 	}
