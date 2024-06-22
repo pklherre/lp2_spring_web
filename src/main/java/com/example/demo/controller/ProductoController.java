@@ -34,7 +34,7 @@ public class ProductoController {
 		
 		List<ProductoEntity>productos = productoService.buscarTodosProductos();
 		model.addAttribute("productos", productos);
-		
+		// push
 		return "menu";
 	}
 
