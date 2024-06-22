@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.entity.UsuarioEntity;
 import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.service.UsuarioService;
+import com.example.demo.utils.Utilitarios;
 
 
 @Service
@@ -21,7 +22,20 @@ public class UsuarioServiceImpl implements UsuarioService{
 	
 	@Override
 	public void crearUsuario(UsuarioEntity usuarioEntity, Model model, MultipartFile foto) {
+		// guardar foto
+		String nombreFoto = Utilitarios.guardarImagen(foto);
+		usuarioEntity.setUrlImagen(nombreFoto);
+		
+		//Hash Password
+		String passwordHash = Utilitarios.extraerHash(usuarioEntity.getPassword());
+		usuarioEntity.setPassword(passwordHash);
+		
+		// guardar usuario
 		usuarioRepository.save(usuarioEntity);
+		
+		// responder a la vista
+		model.addAttribute("registroCorrecto", "Registro Correcto");
+		model.addAttribute("usuario", new UsuarioEntity());
 		
 	}
 

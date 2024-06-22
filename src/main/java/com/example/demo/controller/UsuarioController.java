@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entity.UsuarioEntity;
 import com.example.demo.service.UsuarioService;
+import com.example.demo.utils.Utilitarios;
 
 import javassist.expr.NewArray;
 
@@ -29,6 +30,7 @@ public class UsuarioController {
 	@PostMapping("/registrar")
 	public String registrarUsuario(UsuarioEntity usuarioEntity, Model model, 
 			@RequestParam("foto")MultipartFile foto) {
+		
 		
 		usuarioService.crearUsuario(usuarioEntity, model, foto);
 		
