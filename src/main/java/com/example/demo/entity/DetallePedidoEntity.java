@@ -1,17 +1,11 @@
 package com.example.demo.entity;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import javax.annotation.Generated;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -21,25 +15,25 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "tb_pedido")
+@Table(name = "detalle_pedido")
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class PedidoEntity {
+public class DetallePedidoEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long pedidoId;
+	private Long detalleId;
 	
-	private LocalDate fechaCompra;
+	private Integer cantidad;
 	
 	@ManyToOne
-	@JoinColumn(name = "usuario_id", nullable = false)
-	private UsuarioEntity usuarioEntity;
+	@JoinColumn(name = "producto_id", nullable = false)
+	private ProductoEntity productoEntity;
 	
-	@OneToMany(mappedBy = "pedidoEntity", cascade = CascadeType.ALL)
-	private List<DetallePedidoEntity>detallePedido;
-
+	@ManyToOne
+	@JoinColumn(name = "pedido_id", nullable = false)
+	private PedidoEntity pedidoEntity;
 }
