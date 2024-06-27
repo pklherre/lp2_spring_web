@@ -1,11 +1,19 @@
 package com.example.demo.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +26,7 @@ import com.example.demo.entity.UsuarioEntity;
 import com.example.demo.model.Pedido;
 import com.example.demo.service.ProductoService;
 import com.example.demo.service.UsuarioService;
+import com.example.demo.service.impl.PdfService;
 
 @Controller
 public class ProductoController {
@@ -27,6 +36,9 @@ public class ProductoController {
 	
 	@Autowired
 	private ProductoService productoService;
+	
+	@Autowired
+	private PdfService pdfService;
 	
 	@GetMapping("/menu")
 	public String showMenu(HttpSession session, Model model) {
@@ -52,12 +64,20 @@ public class ProductoController {
 		}
 		model.addAttribute("cant_carrito", productoSession.size());
 		
-		
+		// ver carrito con datos
 		List<DetallePedidoEntity> detallePedidoEntityList = new ArrayList<DetallePedidoEntity>();
+		Double total = 0.0;
+		
 		for(Pedido pedido: productoSession) {
 			DetallePedidoEntity detallePedidoEntity = new DetallePedidoEntity();
-			//ProductoEntity productoEntit
+			ProductoEntity productoEntity = productoService.buscarProductoPorId(pedido.getProductoId());
+			detallePedidoEntity.setProductoEntity(productoEntity);
+			detallePedidoEntity.setCantidad(pedido.getCantidad());
+			detallePedidoEntityList.add(detallePedidoEntity);
+			total += pedido.getCantidad() * productoEntity.getPrecio();
 		}
+		model.addAttribute("carrito", detallePedidoEntityList);
+		model.addAttribute("total", total);
 		
 											
 		return "menu";
@@ -82,5 +102,66 @@ public class ProductoController {
 		return "redirect:/menu";
 		
 	}
+	
+	@GetMapping("/generar_pdf")
+	public ResponseEntity<InputStreamResource>generarPdf(HttpSession session) throws IOException{
+		List<Pedido>productoSession = null;
+		if(session.getAttribute("carrito") == null) {
+			productoSession = new ArrayList<Pedido>();
+		}else {
+			productoSession = (List<Pedido>) session.getAttribute("carrito");
+		}
+		List<DetallePedidoEntity> detallePedidoEntityList = new ArrayList<DetallePedidoEntity>();
+		Double total = 0.0;
+		
+		for(Pedido pedido: productoSession) {
+			DetallePedidoEntity detallePedidoEntity = new DetallePedidoEntity();
+			ProductoEntity productoEntity = productoService.buscarProductoPorId(pedido.getProductoId());
+			detallePedidoEntity.setProductoEntity(productoEntity);
+			detallePedidoEntity.setCantidad(pedido.getCantidad());
+			detallePedidoEntityList.add(detallePedidoEntity);
+			total += pedido.getCantidad() * productoEntity.getPrecio();
+		}
+		
+		Map<String, Object>datosPdf = new HashMap<String, Object>();
+		datosPdf.put("factura", detallePedidoEntityList);
+		datosPdf.put("precio_total", total);
+		
+		ByteArrayInputStream pdfBytes = pdfService.generarPdfDeHtml("template_pdf", datosPdf);
+		
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add("Content-Disposition", "inline; filename=productos.pdf");
+		
+		return ResponseEntity.ok()
+				.headers(httpHeaders)
+				.contentType(MediaType.APPLICATION_PDF)
+				.body(new InputStreamResource(pdfBytes));
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
