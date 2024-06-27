@@ -53,6 +53,8 @@ public class UsuarioServiceImpl implements UsuarioService{
 				usuarioEncontradoPorcCorreo.getPassword())) {
 			return false;
 		}
+		
+		//login exitoso
 		session.setAttribute("usuario", usuarioEncontradoPorcCorreo.getCorreo());
 		
 		return true;
